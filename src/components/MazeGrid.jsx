@@ -263,7 +263,197 @@
 
 
 
-// src/components/MazeGrid.jsx
+// // src/components/MazeGrid.jsx
+// import React, { useEffect, useState } from "react";
+// import { generateMaze } from "../utils/generateMaze";
+// import { motion } from "framer-motion";
+
+// const size = 15;
+
+// const MazeGrid = () => {
+//   const initialData = generateMaze(size);
+//   const [displayMazeData, setDisplayMazeData] = useState(initialData);
+//   const [activeMazeData, setActiveMazeData] = useState(initialData);
+//   const [playerPos, setPlayerPos] = useState(initialData.start);
+//   const [hasWon, setHasWon] = useState(false);
+//   const [hideWalls, setHideWalls] = useState(false);
+//   const [countdown, setCountdown] = useState(5);
+//   const [timeTaken, setTimeTaken] = useState(0);
+//   const [timerActive, setTimerActive] = useState(false);
+//   const [retry, setRetry] = useState(false);
+//   const [level, setLevel] = useState(1); // Added level state
+
+//   useEffect(() => {
+//     let countdownInterval;
+//     setCountdown(5);
+//     setHideWalls(false);
+//     setTimerActive(false);
+//     setRetry(false);
+
+//     const newMazeData = generateMaze(size);
+//     setDisplayMazeData(newMazeData);
+//     setActiveMazeData(newMazeData);
+//     setPlayerPos((prevPos) => prevPos); // Keep player at current position
+
+//     countdownInterval = setInterval(() => {
+//       setCountdown((prev) => {
+//         if (prev <= 1) {
+//           clearInterval(countdownInterval);
+//           setHideWalls(true);
+//           setTimerActive(true);
+//           return 0;
+//         }
+//         return prev - 1;
+//       });
+//     }, 1000);
+
+//     return () => clearInterval(countdownInterval);
+//   }, [retry, level]); // Added level to dependencies
+
+//   useEffect(() => {
+//     if (!timerActive) return;
+//     const timer = setInterval(() => {
+//       setTimeTaken((t) => {
+//         if (t >= 10) {
+//           clearInterval(timer);
+//           setRetry(true);
+//           setTimeTaken(0);
+//           setTimerActive(false);
+//         }
+//         return t + 1;
+//       });
+//     }, 1000);
+//     return () => clearInterval(timer);
+//   }, [timerActive]);
+
+//   const movePlayer = (dr, dc) => {
+//     const newRow = playerPos.row + dr;
+//     const newCol = playerPos.col + dc;
+//     const maze = activeMazeData.maze;
+//     if (
+//       newRow >= 0 &&
+//       newRow < size &&
+//       newCol >= 0 &&
+//       newCol < size &&
+//       maze[newRow][newCol] === 0
+//     ) {
+//       setPlayerPos({ row: newRow, col: newCol });
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (playerPos.row === activeMazeData.goal.row && playerPos.col === activeMazeData.goal.col) {
+//       setHasWon(true);
+//       setTimerActive(false);
+//     }
+//   }, [playerPos, activeMazeData.goal.col, activeMazeData.goal.row]);
+
+//   useEffect(() => {
+//     const handleKeyDown = (e) => {
+//       if (!timerActive || hasWon || retry) return;
+//       if (e.key === "ArrowUp") movePlayer(-1, 0);
+//       if (e.key === "ArrowDown") movePlayer(1, 0);
+//       if (e.key === "ArrowLeft") movePlayer(0, -1);
+//       if (e.key === "ArrowRight") movePlayer(0, 1);
+//     };
+//     window.addEventListener("keydown", handleKeyDown);
+//     return () => window.removeEventListener("keydown", handleKeyDown);
+//   }, [timerActive, hasWon, retry, playerPos]);
+
+//   const handleRetry = () => {
+//     const newMazeData = generateMaze(size);
+//     setDisplayMazeData(newMazeData);
+//     setActiveMazeData(newMazeData);
+//     setPlayerPos(newMazeData.start);
+//     setHasWon(false);
+//     setTimeTaken(0);
+//     setCountdown(5);
+//     setRetry(false);
+//   };
+
+//   // Added next level handler
+//   const handleNextLevel = () => {
+//     const newMazeData = generateMaze(size);
+//     setDisplayMazeData(newMazeData);
+//     setActiveMazeData(newMazeData);
+//     setPlayerPos(newMazeData.start);
+//     setHasWon(false);
+//     setTimeTaken(0);
+//     setCountdown(5);
+//     setRetry(false);
+//     setLevel(level + 1);
+//   };
+
+//   const mazeToRender = hideWalls ? activeMazeData.maze : displayMazeData.maze;
+//   const goal = hideWalls ? activeMazeData.goal : displayMazeData.goal;
+
+//   return (
+//     <div className="flex flex-col items-center p-4">
+//       <h1 className="text-3xl font-bold mb-4">🧠 Memory Maze: AI Escape</h1>
+//       <p className="text-xl mb-2">Level: {level}</p> {/* Added level display */}
+//       {!hideWalls && <p className="text-xl">👀 Memorize the maze: {countdown}s</p>}
+//       {hideWalls && !hasWon && <p className="text-xl">⏱️ Time: {timeTaken}s</p>}
+//       {hasWon && (
+//         <div className="text-green-500 text-2xl">
+//           <p>🎉 You Escaped!</p>
+//           <button 
+//             onClick={handleNextLevel} 
+//             className="mt-2 bg-purple-600 text-white px-4 py-2 rounded"
+//           >
+//             Next Level ({level + 1})
+//           </button>
+//         </div>
+//       )}
+//       {retry && (
+//         <div className="text-red-500 text-xl mt-4">
+//           <p>⏳ Time's up! Try Again?</p>
+//           <button onClick={handleRetry} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Retry</button>
+//         </div>
+//       )}
+//       <div className="grid mt-4" style={{ gridTemplateColumns: `repeat(${size}, 20px)` }}>
+//         {mazeToRender.map((row, rIdx) =>
+//           row.map((cell, cIdx) => {
+//             const isPlayer = rIdx === playerPos.row && cIdx === playerPos.col;
+//             const isGoal = rIdx === goal.row && cIdx === goal.col;
+//             return (
+//               <motion.div
+//                 key={`${rIdx}-${cIdx}`}
+//                 className={`w-5 h-5 border
+//                   ${isPlayer ? "bg-yellow-400" :
+//                   isGoal ? "bg-green-400" :
+//                   hideWalls ? "bg-white" :
+//                   cell === 1 ? "bg-black" : "bg-white"}
+//                 `}
+//                 layout
+//               />
+//             );
+//           })
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default MazeGrid;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import { generateMaze } from "../utils/generateMaze";
 import { motion } from "framer-motion";
@@ -281,7 +471,7 @@ const MazeGrid = () => {
   const [timeTaken, setTimeTaken] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [retry, setRetry] = useState(false);
-  const [level, setLevel] = useState(1); // Added level state
+  const [level, setLevel] = useState(1);
 
   useEffect(() => {
     let countdownInterval;
@@ -293,7 +483,7 @@ const MazeGrid = () => {
     const newMazeData = generateMaze(size);
     setDisplayMazeData(newMazeData);
     setActiveMazeData(newMazeData);
-    setPlayerPos((prevPos) => prevPos); // Keep player at current position
+    setPlayerPos((prevPos) => prevPos);
 
     countdownInterval = setInterval(() => {
       setCountdown((prev) => {
@@ -308,7 +498,7 @@ const MazeGrid = () => {
     }, 1000);
 
     return () => clearInterval(countdownInterval);
-  }, [retry, level]); // Added level to dependencies
+  }, [retry, level]);
 
   useEffect(() => {
     if (!timerActive) return;
@@ -338,6 +528,17 @@ const MazeGrid = () => {
       maze[newRow][newCol] === 0
     ) {
       setPlayerPos({ row: newRow, col: newCol });
+    }
+  };
+
+  const handleMove = (direction) => {
+    if (!timerActive || hasWon || retry) return;
+    
+    switch(direction) {
+      case 'up': movePlayer(-1, 0); break;
+      case 'down': movePlayer(1, 0); break;
+      case 'left': movePlayer(0, -1); break;
+      case 'right': movePlayer(0, 1); break;
     }
   };
 
@@ -371,7 +572,6 @@ const MazeGrid = () => {
     setRetry(false);
   };
 
-  // Added next level handler
   const handleNextLevel = () => {
     const newMazeData = generateMaze(size);
     setDisplayMazeData(newMazeData);
@@ -390,7 +590,7 @@ const MazeGrid = () => {
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="text-3xl font-bold mb-4">🧠 Memory Maze: AI Escape</h1>
-      <p className="text-xl mb-2">Level: {level}</p> {/* Added level display */}
+      <p className="text-xl mb-2">Level: {level}</p>
       {!hideWalls && <p className="text-xl">👀 Memorize the maze: {countdown}s</p>}
       {hideWalls && !hasWon && <p className="text-xl">⏱️ Time: {timeTaken}s</p>}
       {hasWon && (
@@ -410,6 +610,7 @@ const MazeGrid = () => {
           <button onClick={handleRetry} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Retry</button>
         </div>
       )}
+      
       <div className="grid mt-4" style={{ gridTemplateColumns: `repeat(${size}, 20px)` }}>
         {mazeToRender.map((row, rIdx) =>
           row.map((cell, cIdx) => {
@@ -430,6 +631,42 @@ const MazeGrid = () => {
           })
         )}
       </div>
+
+      {/* Arrow Button Controls - Improved Version */}
+{hideWalls && !hasWon && (
+  <div className="mt-6 flex flex-col items-center">
+    <div className="mb-2">
+      <button 
+        onClick={() => handleMove('up')}
+        className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 active:bg-blue-700 text-2xl"
+      >
+        ↑
+      </button>
+    </div>
+    <div className="flex gap-8">
+      <button 
+        onClick={() => handleMove('left')}
+        className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 active:bg-blue-700 text-2xl"
+      >
+        ←
+      </button>
+      <button 
+        onClick={() => handleMove('right')}
+        className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 active:bg-blue-700 text-2xl"
+      >
+        →
+      </button>
+    </div>
+    <div className="mt-2">
+      <button 
+        onClick={() => handleMove('down')}
+        className="w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 active:bg-blue-700 text-2xl"
+      >
+        ↓
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

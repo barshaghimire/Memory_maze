@@ -1,3 +1,38 @@
+# 🧠 Memory Maze: AI Escape  
+
+A React-based memory game where you memorize a maze and navigate to the exit before time runs out!
+
+![Game Screenshot](./screenshot.png) *(Optional: Add a screenshot later)*
+
+## 🚀 Features  
+- Memorize the maze in 5 seconds  
+- Find the exit before the 10-second timer ends  
+- Progress through multiple levels  
+
+## 🛠️ How to Run Locally  
+1. Clone the repo:  
+   ```bash
+   git clone https://github.com/yourusername/memory-maze.git
+   ```
+2. Install dependencies:  
+   ```bash
+   npm install
+   ```
+3. Start the game:  
+   ```bash
+   npm start
+   ```
+
+## 🔗 Live Demo  
+Play here: [Vercel/Netlify Link](#) *(Add after deploying)* 
+
+
+
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,3 +101,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+
+
+
